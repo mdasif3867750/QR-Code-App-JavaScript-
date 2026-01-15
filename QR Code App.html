@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code App</title>
+    <meta name="theme-color" content="#00bcf8">
+    <link rel="shortcut icon" type="image/x-icon">
+    <style>
+* {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+body {
+    min-height: 100vh;
+    background: #dcf7ff;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 3rem;
+}
+canvas {
+    width: 100%;
+    background: white;
+}
+section {
+    width: 336px;
+    background: white;
+    padding: 1rem;
+    transition: 0.2s ease-out;
+}
+.gntr input {
+    width: 100%;
+    margin-block: 1rem;
+    padding: 10px;
+    border: 1px solid gray;
+    font-size: 1rem;
+}
+.gntr button {
+    width: 100%; height: 40px;
+    cursor: pointer;
+    border: none;
+    background: #00bcf8;
+    color: white;
+    font-size: 1rem;
+}
+.gntr #qr {
+    height: 0;
+    overflow: hidden;
+    transition: 0.3s ease-out;
+
+    &.active {
+        height: 305px;
+        margin-top: 16px;
+    }
+    img {
+        width: 100%;
+        padding: 0.7rem;
+        border: 1px solid gray;
+        pointer-events: none;
+    }
+}
+.scnrWpr {
+    position: relative;
+
+    div:has(#camera) {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: white;
+        align-content: center;
+        visibility: hidden;
+
+        &:has(video){
+            visibility: visible;
+
+            & ~ .icon {
+                border-color: #00bcf8;
+    
+                svg {
+                    fill: #00bcf8;
+                }
+            }
+        }
+    }
+}
+.upldBx {
+    position: relative;
+    width: 100%; height: 310px;
+    border: 2px dashed gray;
+    align-content: center;
+    text-align: center;
+    color: gray;
+    margin-block: 1rem;
+    line-height: 2;
+    box-shadow: 0 0 0 beige;
+
+    #qrScnrBx {
+        position: absolute;
+        inset: 0;
+
+        div {
+            width: 100%; height: 100%;
+        }
+    }
+    &.err {
+        border-color: red;
+    }
+    &.blu {
+        border-color: #00bcf8;
+    }
+    &:not(.err) + div:has(textarea:not(:placeholder-shown)) {
+        height: 130px;
+    }
+}
+div:has(textarea) {
+    height: 0;
+    transition: .2s ease-out;
+    overflow: hidden;
+}
+.scnrWpr textarea {
+    width: 100%; height: 100%;
+    resize: none;
+}
+.scnrWpr .icon {
+    cursor: pointer;
+    display: inline-block;
+    border: 1px solid gray;
+    padding: 7px 8px;
+    border-radius: 7px;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 2;
+}
+    </style>
+</head>
+<body>
+    <section class="gntr">
+        <h2>QR Code Generator</h2>
+        <input type="text" placeholder="Enter text">
+        <button onclick="generate()">Generate QR Code</button>
+        <div id="qr" draggable="false"></div>
+    </section>
+    <section class="scnrWpr">
+        <div><div id="camera"></div></div>
+        <h2>QR Code Scanner and Reader</h2>
+        <div onclick="file.click()" class="upldBx">
+            <p>Drag or Click here <br>Upload QR Code to scan</p>
+            <input type="file" id="file" accept="image/*" hidden>
+            <div id="qrScnrBx"><div id="qrScnr"></div></div>
+        </div>
+        <div>
+            <textarea id="text" placeholder=" "></textarea>
+        </div>
+        <span class="icon" onclick="showCamera()">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="gray">
+                <path d="M480-260q75 0 127.5-52.5T660-440q0-75-52.5-127.5T480-620q-75 0-127.5 52.5T300-440q0 75 52.5 127.5T480-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM160-120q-33 0-56.5-23.5T80-200v-480q0-33 23.5-56.5T160-760h126l50-54q11-12 26.5-19t32.5-7h170q17 0 32.5 7t26.5 19l50 54h126q33 0 56.5 23.5T880-680v480q0 33-23.5 56.5T800-120H160Z" />
+            </svg>
+        </span>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="qrcode.js" onerror="alert('QR Code Generator, File was moved some where or file not exit.')"></script>
+<script type="text/javascript" src="html5-qrcode.min.js" onerror="alert('QR Code Scanner, File was moved some where or file not exit.')"></script>
+    <script>
+const gntrInput = document.querySelector('.gntr input'),
+gntrQR = document.getElementById("qr"),
+snrQR = document.querySelector('.upldBx'),
+snrTxt = document.getElementById('text');
+const qrQntr = new QRCode(gntrQR),
+qrCmra = new Html5Qrcode('camera');
+let qrScnr;
+let isCamera = false;
+
+window.onload = () => {
+    gntrInput.value = '';
+    snrTxt.value = '';
+}
+// fav icon
+var qrcodeFav = new QRCode(document.createElement("divs"), {
+    text: "QR Code App",
+    width: 128,
+    height: 128
+});
+document.querySelector('link').href = qrcodeFav._el.firstElementChild.toDataURL('image/png');
+// generator
+function generate(){
+    if(!gntrInput.value) return;
+    gntrQR.className = 'active';
+    qrQntr.makeCode(gntrInput.value);
+}
+gntrInput.onkeyup = e => {if(event.key === "Enter") generate()};
+gntrInput.onblur = () => {if(!gntrInput.value) gntrQR.className = '';}
+// Scanner
+function scan(file){
+    qrScnr = new Html5Qrcode('qrScnr');
+    qrScnr.scanFile(file, true).then(text => {
+        snrTxt.value = text;
+        snrQR.className = 'upldBx';
+    }).catch(err => snrQR.className = 'upldBx err');
+}
+document.getElementById('file').onchange = e => scan(e.target.files[0]);
+// open camera in toggle (open close).
+function showCamera(){
+    isCamera = !isCamera;
+    const stop = function(){
+        qrCmra.stop().then(() => {
+            isCamera = false;
+            qrCmra.clear();
+        })
+    }
+    if(!isCamera) {
+        stop(); return;
+    }
+    if(qrScnr){
+        qrScnr.clear();
+        snrTxt.value = '';
+        snrQR.className = 'upldBx';
+    }
+    qrCmra.start({facingMode: "environment"}, {fps:10, qrbxo: 200}, decoded => {
+        snrTxt.value = decoded;
+        stop();
+    }).catch(err => {
+        alert("Error, Can't Open Camera.");
+        isCamera = false;
+    }) 
+}
+// on drop file
+snrQR.ondragleave = () => snrQR.classList.remove('blu');
+snrQR.ondragover = e => {
+    event.preventDefault();
+    snrQR.classList.add('blu');
+}
+snrQR.ondrop = e => {
+    e.preventDefault();
+    scan([...e.dataTransfer.files].find(f => f.type.startsWith('image/')));
+}
+    </script>
+</body>
+</html>
