@@ -5,7 +5,7 @@ QR Code Generator, Scanner and Reader. JavaScript Project. I'm using two librari
 <a href="https://davidshimjs.github.io/qrcodejs/">QRCode.js</a>
 <br><br><br>
 <b>Scanner Library</b>
-<a href="[https://davidshimjs.github.io/qrcodejs/](https://github.com/mebjas/html5-qrcode)">Html5-QRCode</a>
+<a href="https://github.com/mebjas/html5-qrcode?tab=readme-ov-file#html5-qrcode-1">Html5-QRCode</a>
 this library also scan|read barcode.
 <br><br><br><br>
 this app is offline using internal js files.
